@@ -1,0 +1,105 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Partner intelligence · CIP reports</title>
+<style>
+  :root{--paper:#eef0f3;--surface:#fff;--ink:#1b202b;--muted:#5c6675;--faint:#8b93a1;
+    --line:#e2e5ea;--rail:#1c2431;--rail-fg:#d5dbe5;--rail-muted:#8b95a5;--rail-line:#2c3644;
+    --accent:#127d84;--accent-ink:#0b5257;--t1:#a83226;--t2:#b9622b;--t3:#8a7a2f;--t4:#5d7f6a;--t5:#647089;--maxread:66ch}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55}
+  a{color:var(--accent-ink)}
+  .app{display:grid;grid-template-columns:290px 1fr;min-height:100vh}
+  .rail{background:var(--rail);color:var(--rail-fg);padding:1.5rem 1.15rem;position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto}
+  .brand-link{display:inline-block;color:var(--rail-muted);text-decoration:none;font-size:.8rem;margin-bottom:1rem}
+  .brand-link:hover{color:var(--rail-fg)}
+  .brand{font-family:Iowan Old Style,"Palatino Linotype",Georgia,serif;font-size:1.28rem;font-weight:600;color:#fff;text-wrap:balance}
+  .brand-sub{font-size:.72rem;text-transform:uppercase;letter-spacing:.13em;color:var(--rail-muted);margin-top:.35rem}
+  .rail-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.14em;color:var(--rail-muted);margin:1.8rem 0 .6rem}
+  .reports{display:flex;flex-direction:column;gap:.35rem}
+  .rpt{all:unset;display:grid;grid-template-columns:1fr auto;gap:.15rem .5rem;align-items:baseline;padding:.7rem .8rem;border-radius:9px;cursor:pointer;border:1px solid transparent;transition:background .15s,border-color .15s}
+  .rpt:hover{background:#232d3b}
+  .rpt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .rpt.active{background:#26313f;border-color:var(--rail-line)}
+  .rpt.active .rpt-date{color:#fff}
+  .rpt-date{font-weight:600;font-size:.95rem;color:var(--rail-fg)}
+  .rpt-key{grid-column:1/-1;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.7rem;color:var(--rail-muted);font-variant-numeric:tabular-nums}
+  .rpt-cadence{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;padding:.12rem .45rem;border-radius:999px;border:1px solid var(--rail-line);color:var(--rail-fg)}
+  .rpt-cadence.monthly{color:#e6cfa0;border-color:#5a4c2f}
+  .rpt-count{grid-column:1/-1;font-size:.76rem;color:var(--rail-muted);font-variant-numeric:tabular-nums}
+  .reader{padding:2.6rem clamp(1.1rem,4vw,3.2rem) 4rem}
+  .rpt-head{border-bottom:1px solid var(--line);padding-bottom:1.4rem;margin-bottom:1.9rem}
+  .cadence-tag{display:inline-block;font-size:.7rem;text-transform:uppercase;letter-spacing:.16em;color:var(--accent-ink);font-weight:600;margin-bottom:.5rem}
+  .rpt-head h1{font-family:Iowan Old Style,"Palatino Linotype",Georgia,serif;font-weight:600;font-size:clamp(1.6rem,3.4vw,2.35rem);margin:0;letter-spacing:-.01em;text-wrap:balance}
+  .rpt-meta{margin-top:.55rem;color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+  .section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--faint);margin:2.2rem 0 .9rem;font-weight:600}
+  .highlights{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.55rem}
+  .highlights li{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:.7rem .95rem;font-size:.96rem;max-width:var(--maxread);text-wrap:pretty}
+  .signals{display:flex;flex-direction:column;gap:1rem}
+  .sig{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1.15rem 1.3rem;position:relative;overflow:hidden}
+  .sig::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--tier-c,var(--t5))}
+  .sig h3{font-family:Iowan Old Style,"Palatino Linotype",Georgia,serif;font-weight:600;font-size:1.14rem;margin:0 0 .7rem;line-height:1.3;max-width:var(--maxread);text-wrap:balance}
+  .meta{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .55rem;margin-bottom:.9rem}
+  .tier{font-size:.72rem;font-weight:700;color:#fff;background:var(--tier-c,var(--t5));padding:.14rem .5rem;border-radius:5px;letter-spacing:.03em}
+  .acct{font-weight:650}
+  .cat{font-size:.76rem;color:var(--muted);border:1px solid var(--line);padding:.1rem .5rem;border-radius:999px;background:#f3f5f8}
+  .conf{font-size:.78rem;color:var(--muted);display:inline-flex;align-items:center;gap:.3rem}
+  .dot{width:.5rem;height:.5rem;border-radius:50%;display:inline-block;box-shadow:inset 0 0 0 1.5px var(--muted)}
+  .conf.high .dot{background:var(--accent);box-shadow:none}
+  .sig-date{margin-left:auto;font-size:.8rem;color:var(--faint);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .row{margin:.35rem 0;max-width:var(--maxread);text-wrap:pretty}
+  .row .lbl{font-weight:650;color:var(--ink)}
+  .src{font-size:.82rem;color:var(--muted);margin-top:.75rem}
+  .src a{text-decoration:none;border-bottom:1px solid #bfe0e2}
+  .src a:hover{border-bottom-color:var(--accent)}
+  .prov{color:var(--faint)}
+  details{margin-top:.7rem;max-width:var(--maxread)}
+  summary{cursor:pointer;color:var(--accent-ink);font-size:.85rem;font-weight:600;width:max-content}
+  summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+  details p{margin:.6rem 0 0;color:#3c4658;font-size:.93rem}
+  .quiet{color:var(--muted);font-style:italic}
+  .tier-1{--tier-c:var(--t1)}.tier-2{--tier-c:var(--t2)}.tier-3{--tier-c:var(--t3)}.tier-4{--tier-c:var(--t4)}.tier-5{--tier-c:var(--t5)}
+  /* landing */
+  .landing{max-width:900px;margin:0 auto;padding:clamp(2.5rem,7vw,5rem) 1.4rem 4rem}
+  .landing h1{font-family:Iowan Old Style,"Palatino Linotype",Georgia,serif;font-weight:600;font-size:clamp(2rem,5vw,2.9rem);margin:0;letter-spacing:-.015em}
+  .landing .lead{color:var(--muted);margin:.6rem 0 2.4rem;font-size:1.05rem}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+  .tcard{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;transition:border-color .15s,transform .15s}
+  .tcard:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .tcard h2{font-family:Iowan Old Style,"Palatino Linotype",Georgia,serif;font-weight:600;margin:0 0 .5rem;font-size:1.4rem}
+  .tcard .stat{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+  .tcard .go{margin-top:1rem;color:var(--accent-ink);font-weight:600;font-size:.9rem}
+  .foot{max-width:900px;margin:2.5rem auto 0;padding:0 1.4rem;color:var(--faint);font-size:.8rem}
+  @media (max-width:760px){.app{grid-template-columns:1fr}.rail{position:static;height:auto;padding:1.1rem}.reports{flex-direction:row;overflow-x:auto;gap:.5rem;padding-bottom:.3rem}.rpt{min-width:9.5rem}.sig-date{margin-left:0}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body><div class="app">
+    <aside class="rail"><a class="brand-link" href="./index.html">&larr; All tracks</a>
+      <div class="brand">Partner intelligence</div>
+      <div class="brand-sub">Commercial Intelligence Program</div>
+      <div class="rail-label">Reports</div>
+      <nav class="reports" id="reports" aria-label="Reports"></nav></aside>
+    <main class="reader" id="reader" aria-live="polite"></main></div>
+    <script>const TRACK="Partner";const REPORTS=[{"id":"2026-07-01-weekly","date":"1 Jul 2026","cadence":"weekly","accounts":1,"signals":[{"h":"Wayne Metadata published research on image-manipulation detection at scale.","a":"Wayne Metadata","c":"Integrity","t":3,"cf":"medium","sh":"integrity-wire.example","su":"https://integrity-wire.example/wayne-study","sn":"Integrity Wire","sp":"Secondary","sg":3,"sgn":"Industry news","d":"30 Jun 2026","w":"Research-integrity developments map to our value proposition and surface partnership angles.","ac":"Engage Wayne Metadata on detection methods; explore a shared signal standard.","dt":"Wayne Metadata released a study on detecting manipulated figures across a large corpus, contributing to the integrity discourse and hinting at productization ahead."}],"highlights":["Wayne Metadata published research on image-manipulation detection at scale."]},{"id":"2026-07-01-monthly","date":"1 Jul 2026","cadence":"monthly","accounts":6,"signals":[{"h":"Northwind Publishing announced a content-integrity partnership with a large university press consortium.","a":"Northwind Publishing","c":"Partnership","t":1,"cf":"high","sh":"news.northwind.example","su":"https://news.northwind.example/press/consortium-partnership","sn":"Northwind Publishing","sp":"Primary","sg":1,"sgn":"Account","d":"11 Jun 2026","w":"A new alliance in our core vertical signals where the market is consolidating and opens a concrete outreach hook.","ac":"Reach out to the Northwind partnerships lead to scope where our workflow complements the consortium deal.","dt":"Northwind Publishing has entered a multi-year agreement to provide integrity screening across a consortium of university presses, expanding its footprint in institutional publishing. Worth watching whether the deal is exclusive and how integration is priced."},{"h":"Globex Press acquired a mid-size open-access publisher to expand its journal portfolio.","a":"Globex Press","c":"M&A","t":1,"cf":"medium","sh":"sector-news.example","su":"https://sector-news.example/globex-acquisition","sn":"Sector News","sp":"Secondary","sg":3,"sgn":"Industry news","d":"19 Jun 2026","w":"Consolidation among tracked accounts changes the competitive map and may shift procurement priorities.","ac":"Assess whether the acquired titles overlap with our target accounts and adjust outreach accordingly.","dt":"Globex Press announced the acquisition of an open-access publisher, adding roughly forty journals to its portfolio. The move signals continued roll-up activity in the mid-market and could change how the combined entity buys tooling."},{"h":"Umbrella Analytics shipped an automated reference-validation API.","a":"Umbrella Analytics","c":"AI/Automation","t":3,"cf":"high","sh":"umbrella.example","su":"https://umbrella.example/blog/reference-validation-api","sn":"Umbrella Analytics","sp":"Primary","sg":1,"sgn":"Account","d":"16 Jun 2026","w":"A new AI capability in an adjacent workflow indicates roadmap direction and possible integration surface.","ac":"Evaluate the API against our own validation flow and scope a technical conversation.","dt":"Umbrella Analytics released an API that validates references before submission, moving beyond exact-match checks toward contextual verification. This is a meaningful capability step for an analytics-focused vendor."},{"h":"Initech Data added a dark-mode reading view and semantic search to its platform.","a":"Initech Data","c":"Product","t":3,"cf":"medium","sh":"initech.example","su":"https://initech.example/updates/q2","sn":"Initech Data","sp":"Primary","sg":1,"sgn":"Account","d":"24 Jun 2026","w":"Incremental platform capability changes signal ongoing investment and user-experience priorities.","ac":"Note the semantic-search direction; raise it in the next Initech touchpoint.","dt":"Initech Data's quarterly update introduced semantic search and a redesigned reading view. The semantic direction is the notable part; the rest is routine polish."},{"h":"Hooli Journals' editor-in-chief joined an industry standards working group.","a":"Hooli Journals","c":"Stakeholder","t":4,"cf":"medium","sh":"hooli.example","su":"https://hooli.example/news/standards-group","sn":"Hooli Journals","sp":"Primary","sg":1,"sgn":"Account","d":"9 Jun 2026","w":"Named-individual activity on a standards body reflects influence and a possible channel for engagement.","ac":"Track the working group's output; consider inviting the editor to a roundtable.","dt":"The editor-in-chief of Hooli Journals has taken a seat on a standards working group focused on metadata quality, positioning the account in upcoming standards discussions."},{"h":"Wonka Press hosted a webinar on the future of peer review.","a":"Wonka Press","c":"Event","t":5,"cf":"medium","sh":"wonka.example","su":"https://wonka.example/events/peer-review-webinar","sn":"Wonka Press","sp":"Primary","sg":1,"sgn":"Account","d":"2 Jun 2026","w":"Conference and webinar activity indicates thought-leadership positioning and topics of interest.","ac":"Review the recording for themes; explore co-hosting a future session.","dt":"Wonka Press ran a well-attended webinar featuring several peer-review experts, signaling its interest in shaping the discourse around review workflows."}],"highlights":["Northwind Publishing announced a content-integrity partnership with a large university press consortium.","Globex Press acquired a mid-size open-access publisher to expand its journal portfolio.","Umbrella Analytics shipped an automated reference-validation API."]}];
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const plural=(n,w)=>n+" "+w+(n===1?"":"s");
+function signalCard(s){return `<article class="sig tier-${s.t}"><h3>${esc(s.h)}</h3>
+  <div class="meta"><span class="tier">T${s.t}</span><span class="acct">${esc(s.a)}</span>
+  <span class="cat">${esc(s.c)}</span><span class="conf ${s.cf}"><span class="dot"></span>${esc(s.cf)}</span>
+  <span class="sig-date">${esc(s.d)}</span></div>
+  <p class="row"><span class="lbl">Why it matters.</span> ${esc(s.w)}</p>
+  <p class="row"><span class="lbl">Recommended action.</span> ${esc(s.ac)}</p>
+  <div class="src">Source: <a href="${esc(s.su)}" target="_blank" rel="noopener">${esc(s.sh)}</a>
+  <span class="prov">· ${esc(s.sn)} · ${esc(s.sp)} · Group ${s.sg} · ${esc(s.sgn)}</span></div>
+  <details><summary>Read more</summary><p>${esc(s.dt)}</p></details></article>`}
+function renderReport(r){
+  const hi=r.highlights.length?`<div class="section-label">Highlights</div><ul class="highlights">${r.highlights.map(h=>`<li>${esc(h)}</li>`).join("")}</ul>`:"";
+  const sigs=r.signals.length?`<div class="section-label">${plural(r.signals.length,"signal")}</div><div class="signals">${r.signals.map(signalCard).join("")}</div>`:`<p class="quiet">No material signals this run.</p>`;
+  return `<header class="rpt-head"><div class="cadence-tag">${esc(r.cadence)} report</div>
+    <h1>${esc(TRACK)} intelligence · ${esc(r.date)}</h1>
+    <div class="rpt-meta">${plural(r.signals.length,"signal")} across ${plural(r.accounts,"account")} · <span style="font-family:ui-monospace,monospace">${esc(r.id)}</span></div></header>${hi}${sigs}`}
+const nav=document.getElementById("reports"),reader=document.getElementById("reader");
+nav.innerHTML=REPORTS.map((r,i)=>`<button class="rpt${i===0?" active":""}" data-i="${i}" role="tab" aria-selected="${i===0}">
+  <span class="rpt-date">${esc(r.date)}</span><span class="rpt-cadence ${r.cadence}">${esc(r.cadence)}</span>
+  <span class="rpt-key">${esc(r.id)}</span><span class="rpt-count">${plural(r.signals.length,"signal")} · ${plural(r.accounts,"account")}</span></button>`).join("");
+function select(i){reader.innerHTML=renderReport(REPORTS[i]);window.scrollTo({top:0});[...nav.children].forEach((b,j)=>{b.classList.toggle("active",j===i);b.setAttribute("aria-selected",j===i)})}
+nav.addEventListener("click",e=>{const b=e.target.closest(".rpt");if(b)select(+b.dataset.i)});
+select(0);
+</script></body></html>
