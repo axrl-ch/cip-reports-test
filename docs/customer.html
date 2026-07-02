@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>Commercial Intelligence Program</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Customer intelligence · CIP reports</title>
 <style>
   :root{--paper:#eef0f3;--surface:#fff;--ink:#1b202b;--muted:#5c6675;--faint:#8b93a1;
     --line:#e2e5ea;--rail:#1c2431;--rail-fg:#d5dbe5;--rail-muted:#8b95a5;--rail-line:#2c3644;
@@ -70,19 +70,36 @@
   .foot{max-width:900px;margin:2.5rem auto 0;padding:0 1.4rem;color:var(--faint);font-size:.8rem}
   @media (max-width:760px){.app{grid-template-columns:1fr}.rail{position:static;height:auto;padding:1.1rem}.reports{flex-direction:row;overflow-x:auto;gap:.5rem;padding-bottom:.3rem}.rpt{min-width:9.5rem}.sig-date{margin-left:0}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style></head><body><div class="landing"><h1>Commercial Intelligence Program</h1>
-    <p class="lead">Weekly and monthly partner, customer, and prospect signal reports.</p>
-    <div class="cards"><a class="tcard" href="./customer.html">
-    <h2>Customer</h2>
-    <div class="stat">1 report · 2 signals</div>
-    <div class="stat">Latest: 30 Jun 2026</div>
-    <div class="go">View reports &rarr;</div></a><a class="tcard" href="./partner.html">
-    <h2>Partner</h2>
-    <div class="stat">3 reports · 8 signals</div>
-    <div class="stat">Latest: 2 Jul 2026</div>
-    <div class="go">View reports &rarr;</div></a><a class="tcard" href="./prospect.html">
-    <h2>Prospect</h2>
-    <div class="stat">1 report · 1 signal</div>
-    <div class="stat">Latest: 26 Jun 2026</div>
-    <div class="go">View reports &rarr;</div></a></div></div>
-    <div class="foot">Generated 2026-07-02 · ChronosHub internal</div></body></html>
+</style></head><body><div class="app">
+    <aside class="rail"><a class="brand-link" href="./index.html">&larr; All tracks</a>
+      <div class="brand">Customer intelligence</div>
+      <div class="brand-sub">Commercial Intelligence Program</div>
+      <div class="rail-label">Reports</div>
+      <nav class="reports" id="reports" aria-label="Reports"></nav></aside>
+    <main class="reader" id="reader" aria-live="polite"></main></div>
+    <script>const TRACK="Customer";const REPORTS=[{"id":"2026-06-30-weekly","date":"30 Jun 2026","cadence":"weekly","accounts":2,"signals":[{"h":"Cyberdyne Review appointed a new head of publishing operations.","a":"Cyberdyne Review","c":"Leadership","t":1,"cf":"high","sh":"cyberdyne.example","su":"https://cyberdyne.example/news/new-ops-lead","sn":"Cyberdyne Review","sp":"Primary","sg":1,"sgn":"Account","d":"1 Jul 2026","w":"A leadership change at a customer account can reset priorities and reopen expansion conversations.","ac":"Congratulate the new lead and request an intro call to re-baseline needs.","dt":"Cyberdyne Review named a new head of publishing operations with a background in workflow automation, a signal to revisit account priorities and expansion opportunities."},{"h":"Acme Research posted several roles in editorial technology.","a":"Acme Research","c":"Hiring","t":5,"cf":"low","sh":"careers.acme.example","su":"https://careers.acme.example/listings","sn":"Acme Careers","sp":"Secondary","sg":5,"sgn":"Job boards","d":"28 Jun 2026","w":"Hiring in editorial tech is a weak but useful indicator of investment direction.","ac":"Note the hiring theme; no immediate action.","dt":"Acme Research listed multiple editorial-technology roles, a soft signal of growing internal investment in publishing systems."}],"highlights":["Cyberdyne Review appointed a new head of publishing operations.","Acme Research posted several roles in editorial technology."]}];
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const plural=(n,w)=>n+" "+w+(n===1?"":"s");
+function signalCard(s){return `<article class="sig tier-${s.t}"><h3>${esc(s.h)}</h3>
+  <div class="meta"><span class="tier">T${s.t}</span><span class="acct">${esc(s.a)}</span>
+  <span class="cat">${esc(s.c)}</span><span class="conf ${s.cf}"><span class="dot"></span>${esc(s.cf)}</span>
+  <span class="sig-date">${esc(s.d)}</span></div>
+  <p class="row"><span class="lbl">Why it matters.</span> ${esc(s.w)}</p>
+  <p class="row"><span class="lbl">Recommended action.</span> ${esc(s.ac)}</p>
+  <div class="src">Source: <a href="${esc(s.su)}" target="_blank" rel="noopener">${esc(s.sh)}</a>
+  <span class="prov">· ${esc(s.sn)} · ${esc(s.sp)} · Group ${s.sg} · ${esc(s.sgn)}</span></div>
+  <details><summary>Read more</summary><p>${esc(s.dt)}</p></details></article>`}
+function renderReport(r){
+  const hi=r.highlights.length?`<div class="section-label">Highlights</div><ul class="highlights">${r.highlights.map(h=>`<li>${esc(h)}</li>`).join("")}</ul>`:"";
+  const sigs=r.signals.length?`<div class="section-label">${plural(r.signals.length,"signal")}</div><div class="signals">${r.signals.map(signalCard).join("")}</div>`:`<p class="quiet">No material signals this run.</p>`;
+  return `<header class="rpt-head"><div class="cadence-tag">${esc(r.cadence)} report</div>
+    <h1>${esc(TRACK)} intelligence · ${esc(r.date)}</h1>
+    <div class="rpt-meta">${plural(r.signals.length,"signal")} across ${plural(r.accounts,"account")} · <span style="font-family:ui-monospace,monospace">${esc(r.id)}</span></div></header>${hi}${sigs}`}
+const nav=document.getElementById("reports"),reader=document.getElementById("reader");
+nav.innerHTML=REPORTS.map((r,i)=>`<button class="rpt${i===0?" active":""}" data-i="${i}" role="tab" aria-selected="${i===0}">
+  <span class="rpt-date">${esc(r.date)}</span><span class="rpt-cadence ${r.cadence}">${esc(r.cadence)}</span>
+  <span class="rpt-key">${esc(r.id)}</span><span class="rpt-count">${plural(r.signals.length,"signal")} · ${plural(r.accounts,"account")}</span></button>`).join("");
+function select(i){reader.innerHTML=renderReport(REPORTS[i]);window.scrollTo({top:0});[...nav.children].forEach((b,j)=>{b.classList.toggle("active",j===i);b.setAttribute("aria-selected",j===i)})}
+nav.addEventListener("click",e=>{const b=e.target.closest(".rpt");if(b)select(+b.dataset.i)});
+select(0);
+</script></body></html>
